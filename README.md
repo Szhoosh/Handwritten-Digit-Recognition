@@ -1,5 +1,5 @@
 # Handwritten-Digit-Recognition
-Handwritten Digit Recognition Using the MNIST Dataset
+Handwritten Digit Recognition Using the MNIST Dataset from sctach using only numpy.
 
 
 # App Name: [Handwritten-Digit-Recognition]

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>28x28 Drawing</title>
+    <style>
+        /* General Body Styles */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fb;
+            color: #333;
+        }
+
+        /* Title Styling */
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Canvas Container Styling */
+        #canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* Canvas Styling */
+        #canvas {
+            border-radius: 8px;
+            border: 2px solid #007bff;
+            background-color: white;
+            width: 280px;
+            height: 280px;
+            image-rendering: pixelated;
+        }
+
+        /* Button Container Styling */
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Button Styling */
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s, transform 0.2s;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+        }
+
+        /* Prediction and Probability Styles */
+        #prediction {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .probabilities {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .probabilities span {
+            margin-right: 12px;
+        }
+
+        /* Responsive Design for smaller screens */
+        @media (max-width: 480px) {
+            #canvas {
+                width: 220px;
+                height: 220px;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Draw a Digit (28x28 Canvas)</h2>
+    <div id="canvas-container">
+        <canvas id="canvas" width="28" height="28"></canvas> <!-- 28x28 canvas for the drawing -->
+    </div>
+    <div class="buttons">
+        <button id="clearButton">Clear</button>
+        <button id="submitButton">Submit</button>
+    </div>
+    <h3>Prediction: <span id="prediction">None</span></h3>
+
+    <div class="probabilities" id="probabilities">
+        <span>Probabilities: </span>
+        <span id="prob-0">0: N/A</span>
+        <span id="prob-1">1: N/A</span>
+        <span id="prob-2">2: N/A</span>
+        <span id="prob-3">3: N/A</span>
+        <span id="prob-4">4: N/A</span>
+        <span id="prob-5">5: N/A</span>
+        <span id="prob-6">6: N/A</span>
+        <span id="prob-7">7: N/A</span>
+        <span id="prob-8">8: N/A</span>
+        <span id="prob-9">9: N/A</span>
+    </div>
+
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <script>
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const predictionElement = document.getElementById('prediction');
+        const probabilitiesElement = document.getElementById('probabilities');
+        const clearButton = document.getElementById('clearButton');
+        const submitButton = document.getElementById('submitButton');
+    
+        // Setting up drawing properties
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+    
+        // Fill the canvas with white background initially
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+        let drawing = false;
+    
+        // Calculate the scale factor for mouse position
+        const scale = canvas.width / canvas.clientWidth;
+    
+        // Fix for mouse position to canvas
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (evt.clientX - rect.left) * scale,
+                y: (evt.clientY - rect.top) * scale
+            };
+        }
+    
+        // Drawing on canvas
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            const pos = getMousePos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        });
+    
+        canvas.addEventListener('mousemove', (e) => {
+            if (drawing) {
+                const pos = getMousePos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+        });
+    
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+    
+        // Clear button functionality
+        clearButton.addEventListener('click', () => {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            predictionElement.innerText = 'None';
+            // Reset probabilities to N/A
+            for (let i = 0; i < 10; i++) {
+                document.getElementById(`prob-${i}`).innerText = `${i}: N/A`;
+            }
+        });
+    
+        // Convert canvas to base64 and submit it
+        submitButton.addEventListener('click', () => {
+            const imageData = canvas.toDataURL('image/png');  // Convert canvas to image
+    
+            fetch('/submit-url/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken  // Include the CSRF token
+                },
+                body: JSON.stringify({ image: imageData }),  // Send image data as a JSON object
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update prediction
+                predictionElement.innerText = data.prediction;
+    
+                // Update probabilities as percentage
+                for (let i = 0; i < 10; i++) {
+                    const percentage = (data.probabilities[i] * 100).toFixed(2);  // Convert to percentage
+                    document.getElementById(`prob-${i}`).innerText = `${i}: ${percentage}%`;
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                predictionElement.innerText = 'Error';
+                // Reset probabilities on error
+                for (let i = 0; i < 10; i++) {
+                    document.getElementById(`prob-${i}`).innerText = `${i}: N/A`;
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

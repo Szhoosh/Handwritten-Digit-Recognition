@@ -19,15 +19,14 @@ Handwritten-Digit-Recognition is a web-based application that allows users to dr
 
 ## Screenshots
 
-Below are some screenshots of the app in action:
-
 1. **Homepage**
-   ![Homepage Screenshot](./screenshots/Screenshot 2025-01-14 143930.png)
+   ![Homepage Screenshot](./screenshots/Screenshot_2025-01-14_143930.png)
 
 2. **Prediction Results**
-   ![Prediction Screenshot](./screenshots/Screenshot 2025-01-14 143818.png)
-   ![Prediction Screenshot](./screenshots/Screenshot 2025-01-14 143830.png)
-   ![Prediction Screenshot](./screenshots/Screenshot 2025-01-14 143845.png)
-   ![Prediction Screenshot](./screenshots/Screenshot 2025-01-14 143905.png)
+   ![Prediction Screenshot](./screenshots/Screenshot_2025-01-14_143818.png)
+   ![Prediction Screenshot](./screenshots/Screenshot_2025-01-14_143830.png)
+   ![Prediction Screenshot](./screenshots/Screenshot_2025-01-14_143845.png)
+   ![Prediction Screenshot](./screenshots/Screenshot_2025-01-14_143905.png)
+
 
 
